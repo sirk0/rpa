@@ -37,9 +37,15 @@ def get_individual_investments(department):
     )
     browser_lib.wait_until_element_is_visible(locator_department, timeout=TIMEOUT)
     browser_lib.click_element(locator_department)
+    locator_paging = "//*[@name='investments-table-object_length']"
+    browser_lib.wait_until_element_is_visible(locator_paging, timeout=TIMEOUT)
+    locator_all = locator_paging + "/*[text()='All']"
+    browser_lib.click_element(locator_all)
     locator_rows = "//table[@id='investments-table-object']/tbody/tr"
+    time.sleep(10)
     browser_lib.wait_until_element_is_visible(locator_rows, timeout=TIMEOUT)
     rows = browser_lib.get_webelements(locator_rows)
+    print(len(rows))
     table = []
     for row in rows:
         tds = [td.text for td in row.find_elements_by_xpath(".//td")]
@@ -65,7 +71,7 @@ def download_pdf(link):
         browser_lib.find_element(
             "//a[contains(text(),'Download Business Case PDF')]"
         ).click()
-        time.sleep(15)
+        time.sleep(10)
         file_system_lib.copy_file(source, f"output/{filename}")
 
     finally:
@@ -74,16 +80,6 @@ def download_pdf(link):
 
 def create_excel_worksheet(name, content):
     excel_lib.create_worksheet(name, content=content)
-
-
-def test_rows():
-    try:
-        file_system_lib.create_directory("output")
-        open_the_website("https://itdashboard.gov/drupal/summary/422")
-        investments = get_individual_investments("National Science Foundation")
-        print(investments)
-    finally:
-        browser_lib.close_all_browsers()
 
 
 def main():
@@ -97,7 +93,6 @@ def main():
         create_excel_worksheet("Agencies", list(departments.items()))
         department = "National Science Foundation"
         investments = get_individual_investments(department)
-        print(investments)
         create_excel_worksheet("Investments", investments)
     finally:
         browser_lib.close_all_browsers()
