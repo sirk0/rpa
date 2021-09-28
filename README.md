@@ -1,15 +1,16 @@
 # Introduction
 
  Extract data from <itdashboard.gov>:
- 
- - Get agencies and individual investments and save them to excel file
- - Download all available pdfs to output folder
 
- ## howto
+- Get agencies and individual investments and save them to excel file
+- Download all available pdfs to output folder
 
- Run locally:
- ```
- python tasks.py
- ```
+## howto
+
+Run locally:
+
+```bash
+python tasks.py
+```
 
 Run in the cloud: import repo as a robot on <robocorp.com>
