@@ -89,7 +89,8 @@ def test_rows():
 def main():
     try:
         file_system_lib.create_directory("output")
-        browser_lib.set_download_directory("output")
+        file_system_lib.empty_directory("output")
+        # browser_lib.set_download_directory("output")
         open_the_website("https://itdashboard.gov/")
         departments = get_departments()
         print(departments)
