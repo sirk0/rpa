@@ -1,8 +1,8 @@
 tasks:
-  Run Python:
+  Extract Data:
     shell: python tasks.py
 
-cond/aConfigFile: conda.yaml
+condaConfigFile: conda.yaml
 artifactsDir: output
 PATH:
   - .

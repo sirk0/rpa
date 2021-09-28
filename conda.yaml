@@ -1,0 +1,7 @@
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9.7
+  - pip=21.1
+  - pip:
+      - rpaframework==11.2.1
