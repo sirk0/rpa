@@ -19,7 +19,6 @@ def get_departments() -> dict:
     locator_dive_in = "//a[contains(text(),'DIVE IN')]"
     browser_lib.wait_until_element_is_visible(locator_dive_in, timeout=TIMEOUT)
     browser_lib.click_link(locator_dive_in)
-    # time.sleep(1)
     locator_departments = "//div[@id='agency-tiles-widget']//a[contains(@href,'/drupal/summary/') and not(contains(@class, 'btn')) and not(img)]"
     browser_lib.wait_until_element_is_visible(locator_departments, timeout=TIMEOUT)
     elements = browser_lib.get_webelements(locator_departments)
@@ -37,16 +36,26 @@ def get_individual_investments(department):
     )
     browser_lib.wait_until_element_is_visible(locator_department, timeout=TIMEOUT)
     browser_lib.click_element(locator_department)
+    table = get_table()
+    return table
+
+
+def get_table():
     locator_paging = "//*[@name='investments-table-object_length']"
     browser_lib.wait_until_element_is_visible(locator_paging, timeout=TIMEOUT)
     locator_all = locator_paging + "/*[text()='All']"
     browser_lib.click_element(locator_all)
+    locator_columns = "//div[@class='dataTables_scrollHead']//tr[@role='row']//th"
+    browser_lib.wait_until_element_is_enabled(locator_columns, timeout=TIMEOUT)
+    columns = browser_lib.find_elements(locator_columns)
+    column_names = [column.text for column in columns]
+    print(column_names)
     locator_rows = "//table[@id='investments-table-object']/tbody/tr"
     time.sleep(10)
     browser_lib.wait_until_element_is_visible(locator_rows, timeout=TIMEOUT)
     rows = browser_lib.get_webelements(locator_rows)
     print(len(rows))
-    table = []
+    table = [column_names]
     for row in rows:
         tds = [td.text for td in row.find_elements_by_xpath(".//td")]
         table.append(tds)
@@ -56,7 +65,6 @@ def get_individual_investments(department):
     for link in links:
         print(link)
         download_pdf(link)
-
     return table
 
 
@@ -90,7 +98,8 @@ def main():
         departments = get_departments()
         print(departments)
         excel_lib.create_workbook()
-        create_excel_worksheet("Agencies", list(departments.items()))
+        content = [["department", "total"], *departments.items()]
+        create_excel_worksheet("Agencies", content)
         department = "National Science Foundation"
         investments = get_individual_investments(department)
         create_excel_worksheet("Investments", investments)
