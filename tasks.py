@@ -9,6 +9,7 @@ browser_lib = Selenium()
 excel_lib = Files()
 file_system_lib = FileSystem()
 TIMEOUT = "10s"
+DOWNLOAD_DIR = "~/Downloads"
 
 
 def open_the_website(url):
@@ -71,19 +72,27 @@ def get_table():
 def download_pdf(link):
     try:
         filename = link.split("/")[-1] + ".pdf"
-        source = str(Path("~").expanduser().joinpath("Downloads").joinpath(filename))
-        file_system_lib.remove_file(source)
+        source = Path(DOWNLOAD_DIR).expanduser().joinpath(filename)
+        file_system_lib.remove_file(str(source))
         open_the_website(link)
         locator_download = "//a[contains(text(),'Download Business Case PDF')]"
         browser_lib.wait_until_element_is_visible(locator_download, timeout=TIMEOUT)
         browser_lib.find_element(
             "//a[contains(text(),'Download Business Case PDF')]"
         ).click()
-        time.sleep(10)
-        file_system_lib.copy_file(source, f"output/{filename}")
+        wait_for_function_to_return_true(source.exists, interval_secs=1, count=10)
+        file_system_lib.copy_file(str(source), f"output/{filename}")
 
     finally:
         browser_lib.close_browser()
+
+
+def wait_for_function_to_return_true(fn, interval_secs: float, count: int) -> bool:
+    for _ in range(count):
+        if fn():
+            return True
+        time.sleep(interval_secs)
+    return False
 
 
 def create_excel_worksheet(name, content):
