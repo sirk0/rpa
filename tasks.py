@@ -46,13 +46,15 @@ def get_table():
     browser_lib.wait_until_element_is_visible(locator_paging, timeout=TIMEOUT)
     locator_all = locator_paging + "/*[text()='All']"
     browser_lib.click_element(locator_all)
+    locator_loading = "//div[@class='loading']"
+    browser_lib.wait_until_page_contains_element(locator_loading, timeout=TIMEOUT)
+    browser_lib.wait_until_page_does_not_contain_element(locator_loading, timeout=TIMEOUT)
     locator_columns = "//div[@class='dataTables_scrollHead']//tr[@role='row']//th"
     browser_lib.wait_until_element_is_enabled(locator_columns, timeout=TIMEOUT)
     columns = browser_lib.find_elements(locator_columns)
     column_names = [column.text for column in columns]
     print(column_names)
     locator_rows = "//table[@id='investments-table-object']/tbody/tr"
-    time.sleep(10)
     browser_lib.wait_until_element_is_visible(locator_rows, timeout=TIMEOUT)
     rows = browser_lib.get_webelements(locator_rows)
     print(len(rows))
