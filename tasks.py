@@ -1,9 +1,9 @@
+import time
+from pathlib import Path
+
 from RPA.Browser.Selenium import Selenium
 from RPA.Excel.Files import Files
 from RPA.FileSystem import FileSystem
-
-import time
-from pathlib import Path
 
 browser_lib = Selenium()
 excel_lib = Files()
