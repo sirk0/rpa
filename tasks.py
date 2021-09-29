@@ -116,6 +116,7 @@ def main():
         create_excel_worksheet("Investments", investments)
     finally:
         browser_lib.close_all_browsers()
+        excel_lib.remove_worksheet("Sheet")
         excel_lib.save_workbook("output/Workbook.xlsx")
 
 
