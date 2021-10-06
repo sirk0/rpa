@@ -1,6 +1,4 @@
-import time
 from pathlib import Path
-from typing import Callable
 
 from RPA.Browser.Selenium import Selenium
 from RPA.Excel.Files import Files
@@ -10,7 +8,7 @@ browser_lib = Selenium()
 excel_lib = Files()
 file_system_lib = FileSystem()
 TIMEOUT = "10s"
-DOWNLOAD_DIR = "~/Downloads"
+OUTPUT_DIR = "output"
 
 
 def open_the_website(url):
@@ -68,6 +66,7 @@ def get_table():
     links = [
         uii.get_attribute("href") for uii in row.find_elements_by_xpath("//td[1]/a")
     ]
+    browser_lib.set_download_directory(str(Path(OUTPUT_DIR).absolute()))
     for link in links:
         print(link)
         download_pdf(link)
@@ -77,29 +76,17 @@ def get_table():
 def download_pdf(link):
     try:
         filename = link.split("/")[-1] + ".pdf"
-        source = Path(DOWNLOAD_DIR).expanduser().joinpath(filename)
-        file_system_lib.remove_file(str(source))
+        source = str(Path(OUTPUT_DIR).joinpath(filename))
         open_the_website(link)
         locator_download = "//a[contains(text(),'Download Business Case PDF')]"
         browser_lib.wait_until_element_is_visible(locator_download, timeout=TIMEOUT)
         browser_lib.find_element(
             "//a[contains(text(),'Download Business Case PDF')]"
         ).click()
-        wait_for_function_to_return_true(source.exists, interval_secs=1, count=10)
-        file_system_lib.copy_file(str(source), f"output/{filename}")
+        file_system_lib.wait_until_created(source, timeout=10)
 
     finally:
         browser_lib.close_browser()
-
-
-def wait_for_function_to_return_true(
-    fn: Callable, interval_secs: float, count: int
-) -> bool:
-    for _ in range(count):
-        if fn():
-            return True
-        time.sleep(interval_secs)
-    return False
 
 
 def create_excel_worksheet(name, content):
@@ -108,8 +95,8 @@ def create_excel_worksheet(name, content):
 
 def main():
     try:
-        file_system_lib.create_directory("output")
-        file_system_lib.empty_directory("output")
+        file_system_lib.create_directory(OUTPUT_DIR)
+        file_system_lib.empty_directory(OUTPUT_DIR)
         open_the_website("https://itdashboard.gov/")
         departments = get_departments()
         print(departments)
@@ -122,7 +109,7 @@ def main():
     finally:
         browser_lib.close_all_browsers()
         excel_lib.remove_worksheet("Sheet")
-        excel_lib.save_workbook("output/Workbook.xlsx")
+        excel_lib.save_workbook(f"{OUTPUT_DIR}/Workbook.xlsx")
 
 
 if __name__ == "__main__":
