@@ -1,5 +1,6 @@
 import time
 from pathlib import Path
+from typing import Callable
 
 from RPA.Browser.Selenium import Selenium
 from RPA.Excel.Files import Files
@@ -48,7 +49,9 @@ def get_table():
     browser_lib.click_element(locator_all)
     locator_loading = "//div[@class='loading']"
     browser_lib.wait_until_page_contains_element(locator_loading, timeout=TIMEOUT)
-    browser_lib.wait_until_page_does_not_contain_element(locator_loading, timeout=TIMEOUT)
+    browser_lib.wait_until_page_does_not_contain_element(
+        locator_loading, timeout=TIMEOUT
+    )
     locator_columns = "//div[@class='dataTables_scrollHead']//tr[@role='row']//th"
     browser_lib.wait_until_element_is_enabled(locator_columns, timeout=TIMEOUT)
     columns = browser_lib.find_elements(locator_columns)
@@ -89,7 +92,9 @@ def download_pdf(link):
         browser_lib.close_browser()
 
 
-def wait_for_function_to_return_true(fn, interval_secs: float, count: int) -> bool:
+def wait_for_function_to_return_true(
+    fn: Callable, interval_secs: float, count: int
+) -> bool:
     for _ in range(count):
         if fn():
             return True
